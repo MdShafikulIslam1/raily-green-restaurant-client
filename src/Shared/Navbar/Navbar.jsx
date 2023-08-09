@@ -1,17 +1,47 @@
-import React from "react";
+import React, { useContext } from "react";
+import { Link } from "react-router-dom";
+import { AuthContext } from "../../AuthProvider/AuthProvider";
+import Swal from "sweetalert2";
 
 const Navbar = () => {
+  const { user, logOut } = useContext(AuthContext);
+  const handleLogOut = () => {
+    logOut()
+      .then(() => {
+        Swal.fire("LogOut Successful");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   const menuItems = (
     <>
-      <li><a href="">Home</a></li>
-      <li><a href="">Home</a></li>
-      <li><a href="">Home</a></li>
-      <li><a href="">Home</a></li>
-      <li><a href="">Home</a></li>
+      <li>
+        <Link to="/">Home</Link>
+      </li>
+      <li>
+        <Link to="/menu">Menu</Link>
+      </li>
+      <li>
+        <Link to="/order/salad">Order</Link>
+      </li>
+      {user?.email ? (
+        <>
+          <button onClick={handleLogOut} className="btn btn-primary btn-ghost">
+            LogOut
+          </button>
+        </>
+      ) : (
+        <>
+          <li>
+            <Link to="/login">Login</Link>
+          </li>
+        </>
+      )}
     </>
   );
   return (
-    <div className="navbar bg-gray-100 fixed z-10 max-w-screen-xl bg-transparent font-bold">
+    <div className="navbar bg-gray-400 fixed z-10 max-w-screen-xl bg-opacity-40 text-white font-bold">
       <div className="navbar-start">
         <div className="dropdown">
           <label tabIndex={0} className="btn btn-ghost lg:hidden">
@@ -43,7 +73,7 @@ const Navbar = () => {
         <ul className="menu menu-horizontal px-1">{menuItems}</ul>
       </div>
       <div className="navbar-end">
-        <a className="btn">Button</a>
+        <a className="btn">{user?.email}</a>
       </div>
     </div>
   );
