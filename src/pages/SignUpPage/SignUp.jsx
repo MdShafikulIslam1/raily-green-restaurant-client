@@ -4,17 +4,25 @@ import { AuthContext } from "../../AuthProvider/AuthProvider";
 import Swal from "sweetalert2";
 
 const SignUp = () => {
-  const { createUser } = useContext(AuthContext);
+  const { createUser, updateUserProfile } = useContext(AuthContext);
   const {
     handleSubmit,
     register,
     formState: { errors },
   } = useForm();
   const onSubmit = (data) => {
+    console.log("data", data);
     createUser(data.email, data.password)
       .then((result) => {
         const loggedUser = result.user;
         Swal.fire("successfully SignUp");
+        updateUserProfile(data.name, data.photoUrl)
+          .then(() => {
+            console.log("Updated User profile successfully");
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       })
       .catch((err) => {
         console.log(err);
@@ -40,6 +48,20 @@ const SignUp = () => {
               />
               {errors?.name && (
                 <span className="text-red-600">Name is Required</span>
+              )}
+            </div>
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Photo Url</span>
+              </label>
+              <input
+                type="text"
+                {...register("photoUrl", { required: true })}
+                placeholder="Enter your photo url"
+                className="input input-bordered"
+              />
+              {errors?.photoUrl && (
+                <span className="text-red-600">Photo url is Required</span>
               )}
             </div>
             <div className="form-control">

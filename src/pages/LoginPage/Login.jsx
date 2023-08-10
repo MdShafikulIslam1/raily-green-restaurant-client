@@ -1,5 +1,5 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   loadCaptchaEnginge,
   LoadCanvasTemplate,
@@ -11,6 +11,10 @@ import Swal from "sweetalert2";
 const Login = () => {
   const [disable, setDisable] = useState(true);
   const { signIn } = useContext(AuthContext);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location?.state?.from?.pathname || "/";
   useEffect(() => {
     loadCaptchaEnginge(6);
   }, []);
@@ -27,10 +31,12 @@ const Login = () => {
     const password = form.password.value;
     signIn(email, password)
       .then((result) => {
-        const user = result.user;
+        const loggedUser = result.user;
+        console.log(loggedUser);
         Swal.fire("Successfully Login");
+        navigate(from, { replace: true });
       })
-      .then((err) => {});
+      .catch((err) => console.log(err));
   };
   return (
     <div className="hero min-h-screen bg-gray-100 bg-opacity-70">
@@ -88,7 +94,7 @@ const Login = () => {
             </div>
             <div className="form-control">
               <button
-                disabled={disable}
+                disabled={false}
                 type="submit"
                 className="btn btn-primary"
               >
