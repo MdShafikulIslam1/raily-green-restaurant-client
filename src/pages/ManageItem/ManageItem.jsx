@@ -1,10 +1,13 @@
-import Swal from "sweetalert2";
-import useGetCart from "../../hooks/useGetCart";
+import React from "react";
+import SectionTitle from "../../components/SectionTitle/SectionTitle";
+import useMenu from "../../hooks/useMenu";
 import { FaTrash } from "react-icons/fa";
+import Swal from "sweetalert2";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
-const MyCartPage = () => {
-  const [cart, refetch] = useGetCart();
-  const total = cart.reduce((sum, item) => item.price + sum, 0);
+const ManageItem = () => {
+  const [menu, isLoading, refetch] = useMenu();
+  const [axiosSecure] = useAxiosSecure();
   const handelDeleteItem = (item) => {
     Swal.fire({
       title: "Are you sure?",
@@ -16,40 +19,37 @@ const MyCartPage = () => {
       confirmButtonText: "Yes, delete it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`http://localhost:5000/carts/${item._id}`, {
-          method: "DELETE",
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.deletedCount > 0) {
-              refetch();
-              Swal.fire("Deleted!", "Your file has been deleted.", "success");
-            }
-          });
+        axiosSecure.delete(`/menu/${item._id}`).then((res) => {
+          if (res.data.deletedCount > 0) {
+            refetch();
+            Swal.fire("Deleted!", "Your file has been deleted.", "success");
+          }
+        });
       }
     });
   };
   return (
-    <div>
-      <div className="flex justify-evenly h-10 font-semibold items-center">
-        <h3>Total Items:{cart?.length}</h3>
-        <h3>Total Price: $ {`${total.toFixed(2)}`}</h3>
-        <button className="btn btn-warning btn-sm">Pay</button>
-      </div>
+    <div className="w-full px-8">
+      <SectionTitle
+        subHeading="Hurry up "
+        heading="Manage All Items"
+      ></SectionTitle>
       <div>
         <div className="overflow-x-auto">
           <table className="table">
+            {/* head */}
             <thead>
               <tr>
                 <th>#</th>
-                <th>Item Image</th>
-                <th>Item Name</th>
+                <th>Item</th>
+                <th>Category</th>
                 <th> Price</th>
-                <th>Action</th>
+                <th>Update</th>
+                <th>Delete</th>
               </tr>
             </thead>
             <tbody>
-              {cart.map((item, index) => (
+              {menu.map((item, index) => (
                 <tr key={index}>
                   <td>{index + 1}</td>
                   <td>
@@ -63,7 +63,16 @@ const MyCartPage = () => {
                     </div>
                   </td>
                   <td>{item.name}</td>
-                  <td className="text-end">$ {item.price}</td>
+                  <td className="text-end">${item.price}</td>
+                  <td>
+                    {/* <button
+                      onClick={() => handelDeleteItem(item)}
+                      className="btn btn-ghost btn-md bg-red-600"
+                    >
+                      <FaTrash />
+                    </button> */}
+                    Update
+                  </td>
                   <td>
                     <button
                       onClick={() => handelDeleteItem(item)}
@@ -82,4 +91,4 @@ const MyCartPage = () => {
   );
 };
 
-export default MyCartPage;
+export default ManageItem;

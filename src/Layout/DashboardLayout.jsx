@@ -37,8 +37,13 @@ const DashboardLayout = () => {
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/dashboard/myCart">
+                <NavLink to="/dashboard/addItem">
                   <FaShoppingCart /> Add Items
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/dashboard/manage-item">
+                  <FaShoppingCart /> Manage Items
                 </NavLink>
               </li>
               <li>
