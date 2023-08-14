@@ -21,8 +21,8 @@ const MyCartPage = () => {
         })
           .then((res) => res.json())
           .then((data) => {
-            refetch();
             if (data.deletedCount > 0) {
+              refetch();
               Swal.fire("Deleted!", "Your file has been deleted.", "success");
             }
           });

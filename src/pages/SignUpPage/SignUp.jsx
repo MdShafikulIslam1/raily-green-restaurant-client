@@ -2,32 +2,52 @@ import React, { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../AuthProvider/AuthProvider";
 import Swal from "sweetalert2";
+import GoogleSignIn from "../../components/GoogleSignIn/GoogleSignIn";
+import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
   const { createUser, updateUserProfile } = useContext(AuthContext);
+  const navigate = useNavigate();
   const {
     handleSubmit,
     register,
     formState: { errors },
   } = useForm();
-  const onSubmit = (data) => {
-    console.log("data", data);
-    createUser(data.email, data.password)
-      .then((result) => {
-        const loggedUser = result.user;
-        Swal.fire("successfully SignUp");
-        updateUserProfile(data.name, data.photoUrl)
-          .then(() => {
-            console.log("Updated User profile successfully");
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      })
-      .catch((err) => {
-        console.log(err);
+
+  const onSubmit = async (data) => {
+    try {
+      console.log("data", data);
+
+      // Create user and wait for the promise to resolve
+      await createUser(data.email, data.password);
+
+      // Update user profile and wait for the promise to resolve
+      await updateUserProfile(data.name, data.photoUrl);
+
+      const saveUserData = { name: data.name, email: data.email };
+
+      // Make a POST request and wait for the response
+      const response = await fetch("http://localhost:5000/users", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(saveUserData),
       });
+
+      const responseData = await response.json();
+
+      if (responseData.insertedId) {
+        Swal.fire("Successfully Signed Up");
+        navigate("/");
+      } else {
+        Swal.fire("Error while signing up");
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
   };
+
   return (
     <div className="hero min-h-screen bg-base-200">
       <div className="hero-content flex-col lg:flex-row-reverse">
@@ -126,6 +146,7 @@ const SignUp = () => {
               />
             </div>
           </form>
+          <GoogleSignIn></GoogleSignIn>
         </div>
       </div>
     </div>
